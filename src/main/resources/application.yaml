@@ -1,0 +1,64 @@
+spring:
+  application:
+    name: ${PROJECT_NAME:saasproject}
+
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  jpa:
+    open-in-view: false
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          batch_size: 20
+        order_inserts: true
+        order_updates: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+
+  endpoint:
+    health:
+      show-details: when-authorized
+      probes:
+        enabled: true
+
+  health:
+    redis:
+      enabled: true
+    db:
+      enabled: true
+
+# Application-specific configuration
+app:
+#  jwt:
+#    secret: ${JWT_SECRET:change-this-to-key}
+#    expiration-ms: 864000  # 24 hours
+
+  tenant:
+    default-cache-ttl-seconds: 3600 #1 hour
+
+# Update logging section
+logging:
+  level:
+    root: INFO
+    com.inventorysaas: INFO
+    org.springframework.security: WARN
+    org.hibernate.SQL: WARN
+    org.springframework.web: INFO
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId}] [%X{tenantId}] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] [%X{correlationId}] [%X{tenantId}] %-5level %logger{36} - %msg%n"
+
+  file:
+    name: /var/log/inventory-saas/application.log
+    max-size: 10MB
+    max-history: 30
+    total-size-cap: 1GB
