@@ -15,8 +15,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 const setupSchema = z.object({
   username: z.string().min(3, { message: 'Username must be at least 3 characters' }),
   email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
-  phone: z.string().min(5, { message: 'Phone is required' }),
+  password: z.string().min(8, { message: 'Password must be at least 8 characters' }),
+  phone: z.string().min(10, { message: 'Phone must be at least 10 characters' }).max(14, { message: 'Phone must be at most 14 characters' }),
 });
 
 type SetupFormValues = z.infer<typeof setupSchema>;
@@ -40,8 +40,23 @@ export default function Setup() {
       toast({ title: 'Success', description: 'Super Admin created successfully. Please log in.' });
       navigate('/login');
     } catch (error: any) {
-      if (error.response?.data?.message?.includes('already exists') || error.response?.data?.message?.includes('already registered')) {
+      let errorMessage = error.response?.data?.message || error.response?.data?.error;
+      
+      // Handle validation errors from backend (MethodArgumentNotValidException)
+      if (error.response?.data?.errors && typeof error.response.data.errors === 'object') {
+        errorMessage = Object.values(error.response.data.errors).join(', ');
+      }
+      
+      errorMessage = errorMessage || 'An unexpected error occurred during setup.';
+      
+      if (errorMessage.includes('already exists') || errorMessage.includes('already registered')) {
         setAlreadySetup(true);
+      } else {
+        toast({ 
+          variant: 'destructive',
+          title: 'Setup Failed', 
+          description: errorMessage 
+        });
       }
     } finally {
       setIsLoading(false);
