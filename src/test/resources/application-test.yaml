@@ -21,5 +21,5 @@ spring:
 
 app:
   jwt:
-    secret: "test_secret_key_that_is_at_least_256_bits_long_for_hs256_testing_purposes_only"
-    expiration: 86400000
+    secret: "dGVzdF9zZWNyZXRfa2V5X3RoYXRfaXNfYXRfbGVhc3RfdHdvX2h1bmRyZWRfZmlmdHlfc2l4X2JpdHNfbG9uZ19mb3JfaHMyNTZfdGVzdGluZ19wdXJwb3Nlc19vbmx5X2VuY29kZWRfaW5fYmFzZTY0"
+    expiration-ms: 86400000
