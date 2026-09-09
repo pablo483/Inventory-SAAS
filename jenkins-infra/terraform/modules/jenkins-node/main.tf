@@ -1,5 +1,6 @@
 resource "aws_security_group" "node_sg" {
   name_prefix = "${var.name}-sg-"
+  description = "Security group for Jenkins ${var.role} node"
   vpc_id      = var.vpc_id
 
   dynamic "ingress" {
@@ -8,7 +9,7 @@ resource "aws_security_group" "node_sg" {
       from_port   = ingress.value
       to_port     = ingress.value
       protocol    = "tcp"
-      cidr_blocks = ["0.0.0.0/0"] 
+      cidr_blocks = ["0.0.0.0/0"] # Intentionally open — restrict to known CIDRs in production
     }
   }
 
@@ -17,6 +18,10 @@ resource "aws_security_group" "node_sg" {
     to_port     = 0
     protocol    = "-1"
     cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
 

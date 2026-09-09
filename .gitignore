@@ -1,3 +1,5 @@
+
+jenkins-infra/ansible/
 # ════════════════════════════════════════════════
 # SECRETS & CREDENTIALS (never commit these)
 # ════════════════════════════════════════════════
