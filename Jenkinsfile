@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     tools {
-        maven 'Maven 3.8'
-        nodejs 'Node 20'
+        maven 'maven 3.8'
+        nodejs 'node 26'
     }
 
     environment {
