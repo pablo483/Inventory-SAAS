@@ -1,5 +1,7 @@
 pipeline {
-    agent any
+    agent  {
+        label 'worker'
+    }
 
     tools {
         maven 'maven 3.9'
