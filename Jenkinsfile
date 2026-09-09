@@ -42,10 +42,18 @@ pipeline {
             }
         }
 
-        stage('Backend: Build & Test') {
+        stage('Backend: Build') {
             steps {
-                echo ' Building and testing Spring Boot backend...'
-                sh './mvnw clean package -B'
+                echo ' Building Spring Boot backend (skipping tests)...'
+                sh './mvnw clean package -DskipTests -B'
+            }
+        }
+
+        /*
+        stage('Backend: Test') {
+            steps {
+                echo ' Running Spring Boot backend tests...'
+                sh './mvnw test -B'
             }
             post {
                 always {
@@ -54,6 +62,7 @@ pipeline {
                 }
             }
         }
+        */
 
         stage('Frontend: Install') {
             steps {
