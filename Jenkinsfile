@@ -158,19 +158,19 @@ pipeline {
             archiveArtifacts artifacts: 'target/*.jar, frontend/dist/**',
                              allowEmptyArchive: true,
                              fingerprint: true
-            slackSend(
-                channel: '#deployments',
-                color: 'good',
-                message: "*BUILD SUCCESS*\nBranch: `${env.BRANCH_NAME}`\nCommit: `${DOCKER_TAG}`\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
-            )
+            // slackSend(
+            //     channel: '#deployments',
+            //     color: 'good',
+            //     message: "*BUILD SUCCESS*\nBranch: `${env.BRANCH_NAME}`\nCommit: `${DOCKER_TAG}`\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
+            // )
         }
         failure {
             echo 'Pipeline failed!'
-            slackSend(
-                channel: '#deployments',
-                color: 'danger',
-                message: "*BUILD FAILED*\nBranch: `${env.BRANCH_NAME}`\nCommit: `${DOCKER_TAG}`\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
-            )
+            // slackSend(
+            //     channel: '#deployments',
+            //     color: 'danger',
+            //     message: "*BUILD FAILED*\nBranch: `${env.BRANCH_NAME}`\nCommit: `${DOCKER_TAG}`\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
+            // )
         }
         always {
             sh "docker rmi ${DOCKER_IMAGE}:${DOCKER_TAG} || true"
