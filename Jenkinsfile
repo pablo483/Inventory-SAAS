@@ -104,9 +104,7 @@ pipeline {
         }
 
         stage('Docker: Push to Registry') {
-            when {
-                branch 'sudip'
-            }
+          
             steps {
                 echo "Pushing image to Docker Hub..."
                 withCredentials([usernamePassword(
