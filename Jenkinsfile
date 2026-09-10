@@ -67,7 +67,6 @@ pipeline {
         stage('Frontend: Install') {
             steps {
 
-                sh 'apt-get update && apt-get install -y libatomic1'
                 dir('frontend') {
                     sh 'npm ci'
                 }
