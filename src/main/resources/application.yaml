@@ -37,9 +37,9 @@ management:
 
 # Application-specific configuration
 app:
-#  jwt:
-#    secret: ${JWT_SECRET:change-this-to-key}
-#    expiration-ms: 864000  # 24 hours
+  jwt:
+    secret: ${JWT_SECRET:dGhpc2lzYXN1cGVyc2VjcmV0a2V5Zm9yamF2YXdpdGgyNTZiaXRzYmFzZTY0ZW5jb2RlZGtleWFiY2RlZg==}
+    expiration-ms: ${JWT_EXPIRATION_MS:86400000} # 24 hours
 
   tenant:
     default-cache-ttl-seconds: 3600 #1 hour
