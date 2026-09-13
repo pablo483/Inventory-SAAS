@@ -103,7 +103,7 @@ public class SecurityConfig {
                                 // 6. Endpoint Authorization Rules
                                 .authorizeHttpRequests(auth -> auth
                                                 // Public endpoints
-                                                .requestMatchers("/api/auth/**").permitAll()
+                                                .requestMatchers("/api/auth/**", "/error").permitAll()
                                                 .requestMatchers("/actuator/health/**").permitAll()
 
                                                 // Secured endpoints (Specific roles)
