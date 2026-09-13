@@ -23,7 +23,7 @@ public class SecurityHeadersConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         // Allow specific origin patterns (configure for your domain)
         configuration.setAllowedOriginPatterns(List.of(
-                "https://inventory-backend-taxb.onrender.com",
+                "https://inventory-frontend-2rgc.onrender.com",
                 "http://localhost:*"));
 
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
