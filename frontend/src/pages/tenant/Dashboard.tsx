@@ -1,7 +1,7 @@
 import { useProducts } from '@/hooks/useProducts';
 import { useTransactions } from '@/hooks/useInventory';
 import { useLowStockReport } from '@/hooks/useReports';
-import { Package, AlertTriangle, TrendingUp, History, ArrowRight, Terminal } from 'lucide-react';
+import { Package, AlertTriangle, TrendingUp, ArrowRight, Terminal } from 'lucide-react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';

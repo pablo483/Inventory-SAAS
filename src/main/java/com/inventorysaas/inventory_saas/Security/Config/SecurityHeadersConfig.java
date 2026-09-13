@@ -12,30 +12,28 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- *  * Security headers configuration following OWASP recommendations
+ * * Security headers configuration following OWASP recommendations
  */
 @Configuration
 public class SecurityHeadersConfig {
 
-    //CORS Configuration for production
+    // CORS Configuration for production
     @Bean
-    public CorsConfigurationSource corsConfigurationSource(){
-        CorsConfiguration configuration=new CorsConfiguration();
-        //Allow specific origin patterns (configure for your domain)
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        // Allow specific origin patterns (configure for your domain)
         configuration.setAllowedOriginPatterns(List.of(
-            "http://yourDomain.com",
-            "https://app.yourdomain.com",
-            "http://localhost:*"
-        ));
+                "https://inventory-backend-taxb.onrender.com",
+                "http://localhost:*"));
 
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","PUT","DELETE","PATCH","OPTIONS"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setExposedHeaders(Arrays.asList("X-Correlation-ID","X-Rate-Limit-Remaining"));
+        configuration.setExposedHeaders(Arrays.asList("X-Correlation-ID", "X-Rate-Limit-Remaining"));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L);
 
-        UrlBasedCorsConfigurationSource source =new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/api/**",configuration);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", configuration);
         return source;
     }
 }
