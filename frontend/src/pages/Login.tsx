@@ -300,9 +300,6 @@ export default function Login() {
                 </Button>
               </form>
             </CardContent>
-            <CardFooter className="flex justify-center text-sm text-muted-foreground font-mono">
-               FIRST TIME SETUP? &nbsp;<Link to="/setup" className="hover:text-primary underline">INITIALIZE PLATFORM</Link>
-            </CardFooter>
           </Card>
         </div>
       </div>
