@@ -58,7 +58,7 @@
             <appender-ref ref="ERROR_FILE"/>
         </root>
         <logger name="com.inventorysaas" level="INFO"/>
-        <logger name="org.springframework" level="WARN"/>
+        <logger name="org.springframework" level="INFO"/>
         <logger name="org.hibernate" level="WARN"/>
     </springProfile>
 </configuration>
