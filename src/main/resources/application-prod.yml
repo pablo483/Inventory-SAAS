@@ -9,9 +9,9 @@ spring:
       maximum-pool-size: 20
       minimum-idle: 10
       leak-detection-threshold: 60000
-      connection-timeout: 30000    # 30s — time to wait for a free connection
-      idle-timeout: 600000         # 10min — how long an idle connection stays in pool
-      max-lifetime: 1800000        # 30min — max connection age before forced recycling
+      connection-timeout: 30000 # 30s — time to wait for a free connection
+      idle-timeout: 600000 # 10min — how long an idle connection stays in pool
+      max-lifetime: 1800000 # 30min — max connection age before forced recycling
 
   jpa:
     hibernate:
@@ -43,7 +43,6 @@ spring:
           min-idle: 2
           max-wait: 2000ms
 
-
 server:
   port: 8080
   error:
@@ -53,7 +52,6 @@ server:
     enabled: true # Shrinks the data (GZIP) before sending it to the browser/clien(makes api with  large json request  faster)
   http2:
     enabled: true #Upgrades the connection to the modern HTTP/2 protocol(Allows the server to send multiple files/responses over a single connection simultaneously, reducing "lag.")
-
 
 # Production logging (less verbose)
 logging:
@@ -82,7 +80,7 @@ management:
   metrics:
     export:
       prometheus:
-        enabled: true
+        enabled: true #Activates Spring Boot's internal Micrometer engine to convert Java runtime metrics into the exact format Prometheus understands.
     tags:
       application: ${spring.application.name}
-      environment: prod
+      environment: prod #Attaches metadata labels (application="saasproject", environment="prod") to every single metric.
