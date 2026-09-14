@@ -19,7 +19,12 @@ const loginSchema = z.object({
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
-type VideoSequenceState = 'pre_playing' | 'form_visible' | 'post_playing';
+type VideoSequenceState = 'init' | 'pre_playing' | 'form_visible' | 'post_playing';
+
+let rumbleOsc1: any;
+let rumbleOsc2: any;
+let rumbleGain: any;
+let rumbleCtx: any;
 
 // --- 5. AUDIO ENGINE ---
 const AudioEngine = {
@@ -55,8 +60,118 @@ const AudioEngine = {
       osc.start();
       osc.stop(ctx.currentTime + 1.5);
     } catch(e) {}
+  },
+  playSystemInit: () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(100, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.3);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.1);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+  },
+  playCraneRumble: () => {
+    try {
+      if (rumbleCtx) return;
+      rumbleCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      
+      rumbleOsc1 = rumbleCtx.createOscillator();
+      rumbleOsc1.type = 'sawtooth';
+      rumbleOsc1.frequency.setValueAtTime(40, rumbleCtx.currentTime);
+      
+      rumbleOsc2 = rumbleCtx.createOscillator();
+      rumbleOsc2.type = 'square';
+      rumbleOsc2.frequency.setValueAtTime(65, rumbleCtx.currentTime);
+      
+      const lfo = rumbleCtx.createOscillator();
+      lfo.type = 'sine';
+      lfo.frequency.value = 2;
+      
+      const lfoGain = rumbleCtx.createGain();
+      lfoGain.gain.value = 15;
+      lfo.connect(lfoGain);
+      lfoGain.connect(rumbleOsc1.frequency);
+      
+      rumbleGain = rumbleCtx.createGain();
+      rumbleGain.gain.setValueAtTime(0, rumbleCtx.currentTime);
+      rumbleGain.gain.linearRampToValueAtTime(0.08, rumbleCtx.currentTime + 2);
+      
+      rumbleOsc1.connect(rumbleGain);
+      rumbleOsc2.connect(rumbleGain);
+      rumbleGain.connect(rumbleCtx.destination);
+      
+      rumbleOsc1.start();
+      rumbleOsc2.start();
+      lfo.start();
+    } catch(e) {}
+  },
+  stopCraneRumble: () => {
+    try {
+      if (rumbleGain && rumbleCtx) {
+        rumbleGain.gain.linearRampToValueAtTime(0, rumbleCtx.currentTime + 1.5);
+        setTimeout(() => {
+          if (rumbleOsc1) { rumbleOsc1.stop(); rumbleOsc1.disconnect(); }
+          if (rumbleOsc2) { rumbleOsc2.stop(); rumbleOsc2.disconnect(); }
+          if (rumbleCtx) rumbleCtx.close();
+          rumbleCtx = null;
+          rumbleOsc1 = null;
+          rumbleOsc2 = null;
+          rumbleGain = null;
+        }, 1600);
+      }
+    } catch (e) {}
+  },
+  playFormAppear: () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(3000, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(100, ctx.currentTime + 0.5);
+      
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+    } catch(e) {}
+  },
+  playWarpSwoosh: () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(100, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(1500, ctx.currentTime + 0.8);
+      
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.2);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+      
+      osc.start();
+      osc.stop(ctx.currentTime + 1.2);
+    } catch(e) {}
   }
 };
+
 
 // --- 4. TYPING EFFECT HOOK ---
 function useTypingEffect(text: string, isVisible: boolean, speed = 40) {
@@ -111,7 +226,7 @@ export default function Login() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   
-  const [sequenceState, setSequenceState] = useState<VideoSequenceState>('pre_playing');
+  const [sequenceState, setSequenceState] = useState<VideoSequenceState>('init');
   const [targetPath, setTargetPath] = useState<string | null>(null);
 
   // --- 3. 3D HOVER STATE ---
@@ -144,6 +259,7 @@ export default function Login() {
       }
       
       setSequenceState('post_playing');
+      AudioEngine.playWarpSwoosh();
       
     } catch (error) {
       console.error('Login failed', error);
@@ -157,10 +273,24 @@ export default function Login() {
     }
   };
 
+  const handlePreVideoEnd = () => {
+    AudioEngine.stopCraneRumble();
+    AudioEngine.playFormAppear();
+    setSequenceState('form_visible');
+  };
+
   const skipIntro = () => {
     if (sequenceState === 'pre_playing') {
+       AudioEngine.stopCraneRumble();
+       AudioEngine.playFormAppear();
        setSequenceState('form_visible');
     }
+  };
+
+  const handleInitiate = () => {
+    AudioEngine.playSystemInit();
+    setSequenceState('pre_playing');
+    AudioEngine.playCraneRumble();
   };
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -205,16 +335,34 @@ export default function Login() {
 
       <HudOverlay visible={sequenceState === 'pre_playing'} />
 
+      {/* Init Screen */}
+      {sequenceState === 'init' && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center z-50 bg-black">
+          <div className="text-cyan-400 font-mono mb-8 opacity-70 animate-pulse text-sm">
+            SYSTEM STANDBY. AWAITING MANUAL OVERRIDE.
+          </div>
+          <button 
+            onClick={handleInitiate}
+            className="px-8 py-4 border border-cyan-500/50 bg-cyan-900/20 text-cyan-400 font-mono text-xl tracking-[0.3em] hover:bg-cyan-500/20 hover:border-cyan-400 transition-all hover:shadow-[0_0_30px_rgba(6,182,212,0.5)] relative overflow-hidden group"
+          >
+            <span className="relative z-10">INITIATE</span>
+            <div className="absolute inset-0 bg-cyan-400/10 transform -translate-x-full group-hover:translate-x-0 transition-transform duration-500" />
+          </button>
+        </div>
+      )}
+
       {/* Pre-Login Video Background */}
-      <video 
-        autoPlay 
-        muted 
-        playsInline
-        onEnded={() => setSequenceState('form_visible')}
-        className="fixed inset-0 w-full h-full object-cover z-[-2]"
-      >
-        <source src="/PreLogin.mp4" type="video/mp4" />
-      </video>
+      {sequenceState !== 'init' && (
+        <video 
+          autoPlay 
+          muted 
+          playsInline
+          onEnded={handlePreVideoEnd}
+          className="fixed inset-0 w-full h-full object-cover z-[-2]"
+        >
+          <source src="/PreLogin.mp4" type="video/mp4" />
+        </video>
+      )}
 
       <div 
         className={`fixed inset-0 bg-black/60 z-[-1] transition-opacity duration-1000 ${
