@@ -25,10 +25,18 @@ api.interceptors.response.use(
       const { status, data } = error.response;
 
       if (status === 401) {
-        // Clear token and redirect to login
+        // Clear token and redirect to login if not already there
         localStorage.removeItem('token');
         localStorage.removeItem('role');
-        window.location.href = '/login';
+        if (window.location.pathname !== '/login' && window.location.pathname !== '/') {
+          window.location.href = '/login';
+        } else {
+          toast({
+            variant: "destructive",
+            title: "Access Denied",
+            description: "Wrong username or password",
+          });
+        }
       } else if (status === 403) {
         toast({
           variant: "destructive",
@@ -37,7 +45,19 @@ api.interceptors.response.use(
         });
       } else {
         // Other errors
-        const message = data?.message || data?.error || "Something went wrong";
+        let message = data?.message || data?.error || "Something went wrong";
+        
+        // Handle Spring Boot validation errors map
+        if (data?.errors && typeof data.errors === 'object' && !Array.isArray(data.errors)) {
+          const errorValues = Object.values(data.errors)
+            .filter(val => typeof val === 'string');
+          if (errorValues.length > 0) {
+             message = errorValues.join(', ');
+          }
+        } else if (typeof data === 'string') {
+          message = data;
+        }
+
         toast({
           variant: "destructive",
           title: "Error",
