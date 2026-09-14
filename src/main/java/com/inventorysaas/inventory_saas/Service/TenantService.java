@@ -86,8 +86,10 @@ public class TenantService {
 
         String base = companyName.toLowerCase()
                 .replaceAll("[^a-z0-9]", "_")
-                .replaceAll("_+", "_")
-                .substring(0, Math.min(companyName.length(), 20));
+                .replaceAll("_+", "_");
+                
+        base = base.substring(0, Math.min(base.length(), 20));
+        
         String tenantId = "tenant" + "_" + base + "_" + UUID.randomUUID().toString().substring(0, 8);
 
         if (tenantRepository.existsByTenantId(tenantId)) {
