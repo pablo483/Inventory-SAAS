@@ -43,10 +43,28 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
             org.springframework.dao.DataIntegrityViolationException ex) {
-        log.error("Data integrity violation:{}", ex.getMessage());
+        
+        String errorMessage = "A database error occurred. Please check your inputs.";
+        String detailedMessage = ex.getMostSpecificCause().getMessage();
+        
+        if (detailedMessage != null) {
+            String lowerCaseMsg = detailedMessage.toLowerCase();
+            if (lowerCaseMsg.contains("email")) {
+                errorMessage = "This email address is already registered.";
+            } else if (lowerCaseMsg.contains("phone")) {
+                errorMessage = "This phone number is already registered.";
+            } else if (lowerCaseMsg.contains("tenant_id") || lowerCaseMsg.contains("company")) {
+                errorMessage = "This company name is already registered.";
+            } else if (lowerCaseMsg.contains("duplicate entry")) {
+                errorMessage = "A duplicate entry already exists in the system.";
+            }
+        }
+        
+        log.error("Data integrity violation: {}", detailedMessage);
+        
         ErrorResponse error = new ErrorResponse(
                 HttpStatus.BAD_REQUEST.value(),
-                "Data error: A unique constraint was violated (e.g. duplicate phone number) or data exceeded maximum length.",
+                errorMessage,
                 LocalDateTime.now());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
